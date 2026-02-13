@@ -28,8 +28,8 @@
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--bg-gradient);
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow: auto;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -430,18 +430,23 @@
             const btnHeight = btnRect.height || 50;
 
             // Use smaller margin on mobile devices
-            const margin = window.innerWidth < 600 ? 20 : 50;
+            const margin = window.innerWidth < 600 ? 30 : 50;
 
-            // Calculate safe positioning area
+            // Calculate safe positioning area with proper margins
+            const minX = margin;
             const maxX = window.innerWidth - btnWidth - margin;
+            const minY = margin;
             const maxY = window.innerHeight - btnHeight - margin;
 
-            // Ensure positive values
-            const safeMaxX = Math.max(margin, maxX);
-            const safeMaxY = Math.max(margin, maxY);
+            // Ensure we have valid ranges
+            const safeMinX = Math.max(margin, minX);
+            const safeMaxX = Math.max(safeMinX + 50, maxX); // Ensure at least 50px range
+            const safeMinY = Math.max(margin, minY);
+            const safeMaxY = Math.max(safeMinY + 50, maxY); // Ensure at least 50px range
 
-            const x = Math.random() * (safeMaxX - margin) + margin;
-            const y = Math.random() * (safeMaxY - margin) + margin;
+            // Calculate random position within safe bounds
+            const x = Math.random() * (safeMaxX - safeMinX) + safeMinX;
+            const y = Math.random() * (safeMaxY - safeMinY) + safeMinY;
 
             btn.style.position = 'fixed';
             btn.style.left = x + 'px';
