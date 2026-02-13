@@ -305,7 +305,8 @@
         <p>It’s rare to find someone that feels both calm and dangerous.</p>
         <div class="proposal-btns">
             <button class="btn" id="yesBtn" onclick="acceptProposal()">YES! 😍</button>
-            <button class="btn" id="noBtn" onmouseover="dodgeButton()" ontouchstart="dodgeButton()">No 😢</button>
+            <button class="btn" id="noBtn" onmouseover="dodgeButton(event)"
+                ontouchstart="dodgeButton(event); event.preventDefault();">No 😢</button>
         </div>
     </div>
 
@@ -329,7 +330,7 @@
         const YOUR_EMAIL = "raihan2004ovi@gmail.com";
 
         // ACTION: Customize your love letter here
-        const loveLetterText = "Dearest,/n/nSome meetings don’t arrive with noise./nThey settle quietly — and suddenly nothing feels the same./n/nI didn’t plan on caring this much./nYet here you are…/nwoven into my thoughts like you’ve always belonged there./n/nIt’s strange how certain souls feel less like strangers and more like something remembered./n/nAnd that makes me wonder —/n/nif this feeling isn’t accidental at all./n/n/nSo tell me…/nwhat do we call something that feels inevitable?";
+        const loveLetterText = "Dearest,\n\nSome meetings don’t arrive with noise.\nThey settle quietly — and suddenly nothing feels the same.\n\nI didn’t plan on caring this much.\nYet here you are…\nwoven into my thoughts like you’ve always belonged there.\n\nIt’s strange how certain souls feel less like strangers and more like something remembered.\n\nAnd that makes me wonder —\n\nif this feeling isn’t accidental at all.\n\nSo tell me…\nwhat do we call something that feels inevitable?";
         /* --------------------- */
 
         // Particle System
@@ -409,7 +410,12 @@
 
         // "No" Button Interaction
         let dodgeCount = 0;
-        function dodgeButton() {
+        function dodgeButton(event) {
+            // Prevent default touch behavior to avoid scrolling
+            if (event && event.type === 'touchstart') {
+                event.preventDefault();
+            }
+
             const btn = document.getElementById('noBtn');
             const phrases = [
                 "No 😢", "Are you sure?", "Really?", "Think again!",
@@ -418,15 +424,32 @@
                 "Pookie Why?", "Think again!", "Just say yes!"
             ];
 
-            // Move button
-            const x = Math.random() * (window.innerWidth - 200);
-            const y = Math.random() * (window.innerHeight - 100);
+            // Get actual button dimensions
+            const btnRect = btn.getBoundingClientRect();
+            const btnWidth = btnRect.width || 150;
+            const btnHeight = btnRect.height || 50;
+
+            // Use smaller margin on mobile devices
+            const margin = window.innerWidth < 600 ? 20 : 50;
+
+            // Calculate safe positioning area
+            const maxX = window.innerWidth - btnWidth - margin;
+            const maxY = window.innerHeight - btnHeight - margin;
+
+            // Ensure positive values
+            const safeMaxX = Math.max(margin, maxX);
+            const safeMaxY = Math.max(margin, maxY);
+
+            const x = Math.random() * (safeMaxX - margin) + margin;
+            const y = Math.random() * (safeMaxY - margin) + margin;
 
             btn.style.position = 'fixed';
             btn.style.left = x + 'px';
             btn.style.top = y + 'px';
+            btn.style.zIndex = '999';
+            btn.style.touchAction = 'none'; // Prevent touch gestures on the button
 
-            // Change text
+            // Change text - loops through all phrases
             btn.innerText = phrases[dodgeCount % phrases.length];
             dodgeCount++;
         }
